@@ -14,7 +14,8 @@ start syntax Form
 syntax Question
   = Str Id ":" Type // regular question
   | Str Id ":" Type "=" Expr // computed question
-  | "if" "(" Expr ")" "{" Question* "}" ("else" "{" Question* "}")?
+  | "if" "(" Expr ")" "{" Question* "}" ("else" "{" Question* "}")? // if-then + if-then-else
+  | "{" Question* "}" // block
   ; 
 
 // TODO: +, -, *, /, &&, ||, !, >, <, <=, >=, ==, !=, literals (bool, int, str)
@@ -22,7 +23,9 @@ syntax Question
 // and use C/Java style precedence rules (look it up on the internet)
 syntax Expr 
   = Id \ "true" \ "false" // true/false are reserved keywords.
-  | Str | Int | Bool
+  | Str 
+  | Int 
+  | Bool
   | bracket "(" Expr ")"
   | "!" Expr
   > left Expr ("*" | "/") Expr
