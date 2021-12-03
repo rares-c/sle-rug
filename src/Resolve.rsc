@@ -26,9 +26,14 @@ RefGraph resolve(AForm f) = <us, ds, us o ds>
   when Use us := uses(f), Def ds := defs(f);
 
 Use uses(AForm f) {
-  return {}; 
+  Use uses = {};
+  for(/AExpr e := f){
+    uses += {<identifier.src, identifier.name> | /AId identifier := e};
+  }
+  return uses; 
 }
 
-Def defs(AForm f) {
-  return {}; 
-}
+Def defs(AForm f)
+  = {<identifier.name, identifier.src> | /qstn(str _, AId identifier, AType _) := f}
+  + {<identifier.name, identifier.src> | /qstn(str _, AId identifier, AType _, AExpr _) := f}
+  ; 

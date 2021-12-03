@@ -39,7 +39,7 @@ syntax Expr
 syntax Type
   = "integer" | "boolean";  
   
-lexical Str = [\"] ![\"]* [\"];
+lexical Str = @category="StringLiteral" [\"] ![\"]* [\"];
 
 lexical Int 
   = [0-9]+;
