@@ -26,7 +26,7 @@ AForm cst2ast(frm: (Form) `form <Id f> { <Question* qs> }`)
   = form("<f>", [ cst2ast(q) | Question q <- qs ], src = frm@\loc);
 
 
-AQuestion cst2ast(Question q) { // todo block questions
+AQuestion cst2ast(Question q) { 
   switch (q) {
   	case (Question) `{ <Question* qs> }`: return qblock([cst2ast(qstn) | Question qstn <- qs], src=q@\loc);
   	case (Question) `<Str qsn> <Id f> : <Type t>`: return qstn("<qsn>", id("<f>", src=f@\loc), cst2ast(t), src=q@\loc);
@@ -38,7 +38,7 @@ AQuestion cst2ast(Question q) { // todo block questions
 }
 
 
-AExpr cst2ast(Expr e) { // todo nested expressions within parenthesis
+AExpr cst2ast(Expr e) { 
   switch (e) {
     case (Expr)`<Id x>`: return ref(id("<x>", src=x@\loc), src=x@\loc);
     case (Expr)`<Str x>`: return string("<x>", src=e@\loc);
