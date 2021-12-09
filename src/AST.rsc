@@ -46,4 +46,5 @@ data AId(loc src = |tmp:///|)
 data AType(loc src = |tmp:///|)
   = integerType()
   | booleanType()
+  | stringType()
   ;

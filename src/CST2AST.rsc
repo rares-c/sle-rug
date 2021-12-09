@@ -67,6 +67,7 @@ AType cst2ast(Type t) {
   switch(t) {
     case (Type)`integer`: return integerType(src=t@\loc);
     case (Type)`boolean`: return booleanType(src=t@\loc);
+    case (Type)`string`: return stringType(src=t@\loc);
     default: throw "Error <t>";
   }
 }

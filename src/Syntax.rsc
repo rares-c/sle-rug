@@ -37,7 +37,7 @@ syntax Expr
   ;
   
 syntax Type
-  = "integer" | "boolean";  
+  = "integer" | "boolean" | "string";  
   
 lexical Str = @category="StringLiteral" [\"] ![\"]* [\"];
 
