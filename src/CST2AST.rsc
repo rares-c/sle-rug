@@ -32,8 +32,8 @@ AQuestion cst2ast(Question q) {
   	case (Question) `<Str qsn> <Id f> : <Type t>`: return qstn("<qsn>", id("<f>", src=f@\loc), cst2ast(t), src=q@\loc);
   	case (Question) `<Str qsn> <Id f> : <Type t> = <Expr e>`: return qstn("<qsn>", id("<f>", src=f@\loc), cst2ast(t), cst2ast(e), src=q@\loc);
   	case (Question) `if (<Expr guard>) { <Question* qs> }`: return ifqstn(cst2ast(guard), [cst2ast(qstn) | Question qstn <- qs], src=q@\loc);
-  	case (Question) `if (<Expr guard>) { <Question* qs> } else { <Question* qs2> }`: return ifelqstn(cst2ast(guard), [cst2ast(qstn) | Question qstn <- qs], [cst2ast(qstn) | Question qstn <- qs2], src=q@\loc);
-  	default: throw "Error <q>";
+  	case (Question) `if (<Expr guard>) { <Question* qs> } else { <Question* qs2> }`: return ifelqstn(cst2ast(guard), [cst2ast(qstn) | Question qstn <- qs], [cst2ast(qstn2) | Question qstn2 <- qs2], src=q@\loc);
+  	default: throw "Unhandled question <q>";
   }
 }
 
@@ -54,7 +54,7 @@ AExpr cst2ast(Expr e) {
     case (Expr)`<Expr lhs> \<= <Expr rhs>`: return leq(cst2ast(lhs), cst2ast(rhs), src=e@\loc);
     case (Expr)`<Expr lhs> \> <Expr rhs>`: return gt(cst2ast(lhs), cst2ast(rhs), src=e@\loc);
     case (Expr)`<Expr lhs> \>= <Expr rhs>`: return geq(cst2ast(lhs), cst2ast(rhs), src=e@\loc);
-    case (Expr)`<Expr lhs> == <Expr rhs>`: return eq(cst2ast(lhs), cst2ast(rhs), src=e@\loc);
+    case (Expr)`<Expr lhs> == <Expr rhs>`: return equal(cst2ast(lhs), cst2ast(rhs), src=e@\loc);
     case (Expr)`<Expr lhs> != <Expr rhs>`: return neq(cst2ast(lhs), cst2ast(rhs), src=e@\loc);
     case (Expr)`<Expr lhs> && <Expr rhs>`: return and(cst2ast(lhs), cst2ast(rhs), src=e@\loc);
     case (Expr)`<Expr lhs> || <Expr rhs>`: return or(cst2ast(lhs), cst2ast(rhs), src=e@\loc);
@@ -68,6 +68,6 @@ AType cst2ast(Type t) {
     case (Type)`integer`: return integerType(src=t@\loc);
     case (Type)`boolean`: return booleanType(src=t@\loc);
     case (Type)`string`: return stringType(src=t@\loc);
-    default: throw "Error <t>";
+    default: throw "Unhandled type <t>";
   }
 }

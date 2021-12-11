@@ -14,7 +14,8 @@ start syntax Form
 syntax Question
   = Str Id ":" Type // regular question
   | Str Id ":" Type "=" Expr // computed question
-  | "if" "(" Expr ")" "{" Question* "}" ("else" "{" Question* "}")? // if-then + if-then-else
+  | "if" "(" Expr ")" "{" Question* "}" // if-then
+  | "if" "(" Expr ")" "{" Question* "}" "else" "{" Question* "}" // if-then-else
   | "{" Question* "}" // block
   ; 
 
