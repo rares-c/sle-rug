@@ -19,7 +19,7 @@ loc errors = |project://QL/examples/errors.myql|;
 
 loc tax = |project://QL/examples/tax.myql|;
 
-loc chosen = binary;
+loc chosen = errors;
 
 
 void testProgram(){

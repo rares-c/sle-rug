@@ -34,16 +34,20 @@ set[Message] check(AForm f, TEnv tenv, UseDef useDef) {
   set[Message] msgs = {};
   set[str] seen = {};
   rel[str name, Type tp] seenWithTypes = {};
+  rel[str name, str label, Type tp] seenLabelsTypes = {};
   set[str] seenLabels = {};
   
   for(<loc qdef, loc ndef, str name, str label, Type typ> <- tenv){
   	if(name in seen){ 
   	  if(<name, typ> notin seenWithTypes) {
   	  	msgs += {error("Duplicate names but different types", ndef)};  // same name but different types.
+  	  } else if (<name, label, typ> notin seenLabelsTypes){
+  	  	msgs += {warning("Different label for occurrences of the same questions", qdef)};
   	  }
   	} else {
   	  seen += {name};
   	  seenWithTypes += {<name, typ>};
+  	  seenLabelsTypes += {<name, label, typ>};
   	}
   	
   	if(label in seenLabels){ // label already seen
@@ -101,7 +105,7 @@ set[Message] check(AExpr e, TEnv tenv, UseDef useDef) {
 	case not(AExpr expr):{
 		  set[Message] deeperErrors = check(expr, tenv, useDef);
 		  if(deeperErrors == {}){
-		    msgs += { error("Invalid argument of NOT", e.src) | typeOf(expr, tenv, useDef) != tbool()};
+		    msgs += { error("Invalid type of argument of NOT", e.src) | typeOf(expr, tenv, useDef) != tbool()};
 		  }
 		  msgs += deeperErrors;
 	  }
@@ -215,23 +219,23 @@ Type typeOf(AExpr e, TEnv tenv, UseDef useDef) {
       }
       }
     // Check(AExpr) takes care already of checking if the arguments of an expression are of the same type
-    // So if it gets here, there's no need to check if the typeOf(lhs) == typeOf(rhs)
+    // So if it gets here, there's no need to check the deeper levels again
     case string(str _): return tstr();
     case integer(int _): return tint();
     case boolean(bool _): return tbool();
-    case not(AExpr expr): return typeOf(expr, tenv, useDef);
-    case mul(AExpr lhs, AExpr _): return typeOf(lhs, tenv, useDef);
-    case div(AExpr lhs, AExpr _): return typeOf(lhs, tenv, useDef);
-  	case sum(AExpr lhs, AExpr _): return typeOf(lhs, tenv, useDef);
-  	case sub(AExpr lhs, AExpr _): return typeOf(lhs, tenv, useDef);
+    case not(AExpr _): return tbool();
+    case mul(AExpr _, AExpr _): return tint();
+    case div(AExpr _, AExpr _): return tint();
+  	case sum(AExpr _, AExpr _): return tint();
+  	case sub(AExpr _, AExpr _): return tint();
   	case lt(AExpr _, AExpr _): return tbool();
   	case leq(AExpr _, AExpr _): return tbool();
   	case gt(AExpr _, AExpr _): return tbool();
   	case geq(AExpr _, AExpr _): return tbool();
   	case equal(AExpr _, AExpr _): return tbool();
   	case neq(AExpr _, AExpr _): return tbool();
-  	case and(AExpr lhs, AExpr _): return typeOf(lhs, tenv, useDef);
-  	case or(AExpr lhs, AExpr _): return typeOf(lhs, tenv, useDef);
+  	case and(AExpr _, AExpr _): return tbool();
+  	case or(AExpr _, AExpr _): return tbool();
   }
   return tunknown(); 
 }
