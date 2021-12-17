@@ -9,6 +9,16 @@ import Resolve;
  
 // NB: Eval may assume the form is type- and name-correct.
 
+// Maps an abstract type to a default value
+Value atype2def(AType tp){
+	switch(tp){
+		case integerType(): return vint(0);
+		case booleanType(): return vbool(false);
+		case stringType(): return vstr("");
+		default: throw("Unknown ATYPE");
+	}
+}
+
 
 // Semantic domain for expressions (values)
 data Value
@@ -27,7 +37,12 @@ data Input
 // produce an environment which for each question has a default value
 // (e.g. 0 for int, "" for str etc.)
 VEnv initialEnv(AForm f) {
-  return ();
+  VEnv venv = ();
+  visit(f){
+  	case qstn(str _, AId identifier, AType tp): venv += (identifier.name: atype2def(tp));
+  	case qstn(str _, AId identifier, AType tp, AExpr _): venv += (identifier.name: atype2def(tp));
+  }
+  return venv;
 }
 
 
@@ -40,21 +55,64 @@ VEnv eval(AForm f, Input inp, VEnv venv) {
 }
 
 VEnv evalOnce(AForm f, Input inp, VEnv venv) {
-  return (); 
+	for(AQuestion q <- f.questions){
+		venv = eval(q, inp, venv);
+	}
+  return venv; 
 }
 
 VEnv eval(AQuestion q, Input inp, VEnv venv) {
   // evaluate conditions for branching,
   // evaluate inp and computed questions to return updated VEnv
-  return (); 
+  switch(q){
+    case qstn(str _, AId identifier, AType _): if(identifier.name == inp.question) venv[identifier.name] = inp.\value;
+  	case qstn(str _, AId identifier, AType _, AExpr expr): venv[identifier.name] = eval(expr, venv);
+  	case ifqstn(AExpr guard, list[AQuestion] questions): {
+  		if(eval(guard, venv).b){
+  			for(AQuestion qs <- questions){
+  				venv = eval(qs, inp, venv);
+  			}
+  		}
+  	}
+  	case ifelqstn(AExpr guard, list[AQuestion] tQuestions, list[AQuestion] fQuestions):{
+  		if(eval(guard, venv).b){
+  			for(AQuestion qs <- tQuestions){
+  				venv = eval(qs, inp, venv);
+  			}
+  		} else {
+  			for(AQuestion qs <- fQuestions){
+  				venv = eval(qs, inp, venv);
+  			}
+  		}
+  	}
+  	case qblock(list[AQuestion] questions):{
+  		for(AQuestion qs <- questions){
+  			venv = eval(qs, inp, venv);
+  		}
+  	}
+  }
+  return venv; 
 }
 
 Value eval(AExpr e, VEnv venv) {
   switch (e) {
     case ref(id(str x)): return venv[x];
-    
-    // etc.
-    
+    case string(str name): return vstr(name);
+    case integer(int vlue): return vint(vlue);
+    case boolean(bool boolean): return vbool(boolean);
+    case not(AExpr expr): return vbool(!eval(expr, venv).b);
+    case mul(AExpr lhs, AExpr rhs): return vint(eval(lhs, venv).n * eval(rhs,venv).n);
+    case div(AExpr lhs, AExpr rhs): return vint(eval(lhs, venv).n / eval(rhs,venv).n);
+    case sum(AExpr lhs, AExpr rhs): return vint(eval(lhs, venv).n + eval(rhs,venv).n);
+    case sub(AExpr lhs, AExpr rhs): return vint(eval(lhs, venv).n - eval(rhs,venv).n);
+    case lt(AExpr lhs, AExpr rhs): return vbool(eval(lhs, venv).n < eval(rhs, venv).n);
+    case leq(AExpr lhs, AExpr rhs): return vbool(eval(lhs, venv).n <= eval(rhs, venv).n);
+    case gt(AExpr lhs, AExpr rhs): return vbool(eval(lhs, venv).n > eval(rhs, venv).n);
+    case geq(AExpr lhs, AExpr rhs): return vbool(eval(lhs, venv).n >= eval(rhs, venv).n);
+    case equal(AExpr lhs, AExpr rhs): return vbool(eval(lhs, venv) == eval(rhs, venv));
+    case neq(AExpr lhs, AExpr rhs): return vbool(eval(lhs, venv) != eval(rhs, venv));
+    case and(AExpr lhs, AExpr rhs): return vbool(eval(lhs, venv).b &&  eval(rhs, venv).b);
+    case or(AExpr lhs, AExpr rhs): return vbool(eval(lhs, venv).b ||  eval(rhs, venv).b);
     default: throw "Unsupported expression <e>";
   }
 }
