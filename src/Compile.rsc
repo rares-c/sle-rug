@@ -126,7 +126,7 @@ str generateInitialValues(AForm f){
 						'	document.getElementById(\"<identifier.name + "-" + label[1..-1] + "-true">\").checked = false;
 						'	document.getElementById(\"<identifier.name + "-" + label[1..-1] + "-false">\").checked = true;
 						'	}
-						";
+						'";
 				}
 	}
 	
@@ -142,7 +142,7 @@ str generateInitialValues(AForm f){
 						'	document.getElementById(\"<identifier.name + "-" + label[1..-1] + "-true">\").checked = false;
 						'	document.getElementById(\"<identifier.name + "-" + label[1..-1] + "-false">\").checked = true;
 						'	}
-						";
+						'";
 				}
 	}
 	return returnString;
@@ -190,7 +190,7 @@ str generateUpdateFunction(AForm f){
 	'	}
 	'	<questions2js(f.questions)>
 	'	}
-	";
+	'";
 }
 
 str questions2js(list[AQuestion] questions){
@@ -210,7 +210,7 @@ str questions2js(list[AQuestion] questions){
 						'	document.getElementById(\"<identifier.name + "-" + label[1..-1] + "-true">\").checked = false;
 						'	document.getElementById(\"<identifier.name + "-" + label[1..-1] + "-false">\").checked = true;
 						'	}
-						";
+						'";
 				}
 			}
 			case ifqstn(AExpr guard, list[AQuestion] qstns):
@@ -220,7 +220,7 @@ str questions2js(list[AQuestion] questions){
 				' } else {
 				'	document.getElementById(\"<guard.src>\").style.display = \"none\";
 				' }
-				";
+				'";
 			case ifelqstn(AExpr guard, list[AQuestion] tQuestions, list[AQuestion] fQuestions):
 				returnString += "if(<expr2js(guard)>) {
 				'	document.getElementById(\"<guard.src>\").style.display = \"block\";
@@ -231,7 +231,7 @@ str questions2js(list[AQuestion] questions){
 				'	document.getElementById(\"else-<guard.src>\").style.display = \"block\";
 				'	<questions2js(fQuestions)>
 				' }
-				";
+				'";
 			case qblock(list[AQuestion] qstns):
 				returnString += questions2js(qstns);
 		}
