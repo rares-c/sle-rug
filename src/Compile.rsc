@@ -53,7 +53,7 @@ str questions2html(list[AQuestion] questions) {
 				returnString += "<label[1..-1]>\<br\>\n";
 				switch(tp){
 					case integerType(): returnString += "\<input type=\"number\" id=\"<identifier.name + "-" + label[1..-1]>\" name=\"<identifier.name + "-" + label[1..-1]>\" oninput=\"updateForm(this.id)\"  \>\<br\>\n";
-					case booleanType(): returnString += "\<input type=\"radio\" id=\"<identifier.name + "-" + label[1..-1] + "-true">\" name=\"<identifier.name + "-" + label[1..-1]>\" value=\"True\" oninput=\"updateForm(this.id)\" \>\n\<label for=\"<identifier.name + "-" + label[1..-1] + "-true">\"\> True \</label\>\<br\>\n\<input type=\"radio\" id=\"<identifier.name + "-" + label[1..-1] + "-false">\" name=\"<identifier.name + "-" + label[1..-1]>\" value=\"False\" oninput=\"updateForm(this.id)\" \>\n\<label for=\"<identifier.name + "-" + label[1..-1] + "-false">\"\> False \</label\>\<br\>\n";
+					case booleanType(): returnString += "\<input type=\"radio\" id=\"<identifier.name + "-" + label[1..-1] + "-true">\" name=\"<identifier.name + "-" + label[1..-1]>\" value=\"True\" oninput=\"updateForm(this.id)\" \>\n\<label for=\"<identifier.name + "-" + label[1..-1] + "-true">\"\> Yes \</label\>\<br\>\n\<input type=\"radio\" id=\"<identifier.name + "-" + label[1..-1] + "-false">\" name=\"<identifier.name + "-" + label[1..-1]>\" value=\"False\" oninput=\"updateForm(this.id)\" \>\n\<label for=\"<identifier.name + "-" + label[1..-1] + "-false">\"\> No \</label\>\<br\>\n";
 					case stringType(): returnString += "\<input type=\"text\" id=\"<identifier.name + "-" + label[1..-1]>\" name=\"<identifier.name + "-" + label[1..-1]>\" oninput=\"updateForm(this.id)\" \>\<br\> \n";
 				}
 			}
@@ -61,7 +61,7 @@ str questions2html(list[AQuestion] questions) {
 				returnString += "<label[1..-1]>\<br\>\n";
 				switch(tp){
 					case integerType(): returnString += "\<input type=\"number\" disabled id=\"<identifier.name + "-" + label[1..-1]>\" name=\"<identifier.name + "-" + label[1..-1]>\"\>\<br\>\n";
-					case booleanType(): returnString += "\<input type=\"radio\" disabled id=\"<identifier.name + "-" + label[1..-1] + "-true">\" name=\"<identifier.name + "-" + label[1..-1]>\" value=\"True\"\>\n\<label for=\"<identifier.name + "-" + label[1..-1] + "-true">\"\> True \</label\>\<br\>\n\<input type=\"radio\" disabled id=\"<identifier.name + "-" + label[1..-1] + "-false">\" name=\"<identifier.name + "-" + label[1..-1]>\" value=\"False\"\>\n\<label for=\"<identifier.name + "-" + label[1..-1] + "-false">\"\> False \</label\>\<br\>\n";
+					case booleanType(): returnString += "\<input type=\"radio\" disabled id=\"<identifier.name + "-" + label[1..-1] + "-true">\" name=\"<identifier.name + "-" + label[1..-1]>\" value=\"True\"\>\n\<label for=\"<identifier.name + "-" + label[1..-1] + "-true">\"\> Yes \</label\>\<br\>\n\<input type=\"radio\" disabled id=\"<identifier.name + "-" + label[1..-1] + "-false">\" name=\"<identifier.name + "-" + label[1..-1]>\" value=\"False\"\>\n\<label for=\"<identifier.name + "-" + label[1..-1] + "-false">\"\> No \</label\>\<br\>\n";
 					case stringType(): returnString += "\<input type=\"text\" disabled id=\"<identifier.name + "-" + label[1..-1]>\" name=\"<identifier.name + "-" + label[1..-1]>\"\>\<br\> \n";
 				}
 			}

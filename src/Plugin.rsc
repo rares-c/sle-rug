@@ -21,7 +21,7 @@ loc errors = |project://QL/examples/errors.myql|;
 
 loc tax = |project://QL/examples/tax.myql|;
 
-loc chosen = binary;
+loc chosen = tax;
 
 AForm f = cst2ast(parse(#start[Form], chosen));
 
