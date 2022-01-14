@@ -93,6 +93,53 @@ set[Message] check(AQuestion q, TEnv tenv, UseDef useDef) {
   return msgs; 
 }
 
+set[Message] deepErrors(AExpr lhs, AExpr rhs, TEnv tenv, UseDef useDef){
+	return check(lhs, tenv, useDef) + check(rhs, tenv, useDef);
+}
+
+set[Message] checkBinary(AExpr e, TEnv tenv, UseDef useDef) {
+	set[Message] msgs = {};
+	switch(e){
+		case mul(AExpr lhs, AExpr rhs):{
+			msgs += { error("Invalid types of arguments of multiplication", e.src) | typeOf(lhs, tenv, useDef) != tint() || typeOf(rhs, tenv, useDef) != tint()};
+		}
+	    case div(AExpr lhs, AExpr rhs):{
+			msgs += { error("Invalid types of arguments of division", e.src) | typeOf(lhs, tenv, useDef) != tint() || typeOf(rhs, tenv, useDef) != tint()};
+		}
+	    case sum(AExpr lhs, AExpr rhs):{
+			msgs += { error("Invalid types of arguments of sum", e.src) | typeOf(lhs, tenv, useDef) != tint() || typeOf(rhs, tenv, useDef) != tint()};
+		}
+	    case sub(AExpr lhs, AExpr rhs):{
+			msgs += { error("Invalid types of arguments of subtraction", e.src) | typeOf(lhs, tenv, useDef) != tint() || typeOf(rhs, tenv, useDef) != tint()};
+		}
+	    case lt(AExpr lhs, AExpr rhs):{
+			msgs += { error("Invalid types of arguments of \<", e.src) | typeOf(lhs, tenv, useDef) != tint() || typeOf(rhs, tenv, useDef) != tint()};
+		}
+	    case leq(AExpr lhs, AExpr rhs):{
+			msgs += { error("Invalid types of arguments of \<=", e.src) | typeOf(lhs, tenv, useDef) != tint() || typeOf(rhs, tenv, useDef) != tint()};
+		}
+	    case gt(AExpr lhs, AExpr rhs):{
+			msgs += { error("Invalid types of arguments of \>", e.src) | typeOf(lhs, tenv, useDef) != tint() || typeOf(rhs, tenv, useDef) != tint()};
+		}
+	    case geq(AExpr lhs, AExpr rhs):{
+			msgs += { error("Invalid types of arguments of \>=", e.src) | typeOf(lhs, tenv, useDef) != tint() || typeOf(rhs, tenv, useDef) != tint()};
+		}
+	    case equal(AExpr lhs, AExpr rhs):{
+			msgs += { error("Invalid types of arguments of ==", e.src) | typeOf(lhs, tenv, useDef) != typeOf(rhs, tenv, useDef) || typeOf(rhs, tenv, useDef) == tunknown()};
+		}
+	    case neq(AExpr lhs, AExpr rhs):{
+	  		msgs += { error("Invalid types of arguments of !=", e.src) | typeOf(lhs, tenv, useDef) != typeOf(rhs, tenv, useDef) || typeOf(rhs, tenv, useDef) == tunknown()}; 
+		}
+	    case and(AExpr lhs, AExpr rhs):{
+	  		msgs += { error("Invalid types of arguments of AND", e.src) | typeOf(lhs, tenv, useDef) != tbool() || typeOf(rhs, tenv, useDef) != tbool()}; 
+		}
+	    case or(AExpr lhs, AExpr rhs):{
+	  		msgs += { error("Invalid types of arguments of OR", e.src) | typeOf(lhs, tenv, useDef) != tbool() || typeOf(rhs, tenv, useDef) != tbool()}; 
+		}
+	}
+	return msgs;
+}
+
 // Check operand compatibility with operators.
 // E.g. for an addition node add(lhs, rhs), 
 //   the requirement is that typeOf(lhs) == typeOf(rhs) == tint()
@@ -109,105 +156,18 @@ set[Message] check(AExpr e, TEnv tenv, UseDef useDef) {
 		  }
 		  msgs += deeperErrors;
 	  }
-	case mul(AExpr lhs, AExpr rhs):{
-		set[Message] deeperErrorsLhs = check(lhs, tenv, useDef);
-		set[Message] deeperErrorsRhs = check(rhs, tenv, useDef);
-		if(deeperErrorsLhs == {} && deeperErrorsRhs == {}){
-			msgs += { error("Invalid types of arguments of multiplication", e.src) | typeOf(lhs, tenv, useDef) != tint() || typeOf(rhs, tenv, useDef) != tint()};
+	case string(str _): ;
+  	case integer(int _): ;
+  	case boolean(bool _): ;
+	default:{
+		deeperErrors = deepErrors(e.lhs, e.rhs, tenv, useDef);
+		if(deeperErrors == {}) {
+			msgs += checkBinary(e, tenv, useDef);
+		} else {
+			msgs += deeperErrors;
 		}
-		msgs += deeperErrorsLhs + deeperErrorsRhs;
-	}
-    case div(AExpr lhs, AExpr rhs):{
-		set[Message] deeperErrorsLhs = check(lhs, tenv, useDef);
-		set[Message] deeperErrorsRhs = check(rhs, tenv, useDef);
-		if(deeperErrorsLhs == {} && deeperErrorsRhs == {}){
-			msgs += { error("Invalid types of arguments of division", e.src) | typeOf(lhs, tenv, useDef) != tint() || typeOf(rhs, tenv, useDef) != tint()};
-		}
-		msgs += deeperErrorsLhs + deeperErrorsRhs;
-	}
-    case sum(AExpr lhs, AExpr rhs):{
-		set[Message] deeperErrorsLhs = check(lhs, tenv, useDef);
-		set[Message] deeperErrorsRhs = check(rhs, tenv, useDef);
-		if(deeperErrorsLhs == {} && deeperErrorsRhs == {}){
-			msgs += { error("Invalid types of arguments of sum", e.src) | typeOf(lhs, tenv, useDef) != tint() || typeOf(rhs, tenv, useDef) != tint()};
-		}
-		msgs += deeperErrorsLhs + deeperErrorsRhs;
-	}
-    case sub(AExpr lhs, AExpr rhs):{
-		set[Message] deeperErrorsLhs = check(lhs, tenv, useDef);
-		set[Message] deeperErrorsRhs = check(rhs, tenv, useDef);
-		if(deeperErrorsLhs == {} && deeperErrorsRhs == {}){
-			msgs += { error("Invalid types of arguments of subtraction", e.src) | typeOf(lhs, tenv, useDef) != tint() || typeOf(rhs, tenv, useDef) != tint()};
-		}
-		msgs += deeperErrorsLhs + deeperErrorsRhs;
-	}
-    case lt(AExpr lhs, AExpr rhs):{
-		set[Message] deeperErrorsLhs = check(lhs, tenv, useDef);
-		set[Message] deeperErrorsRhs = check(rhs, tenv, useDef);
-		if(deeperErrorsLhs == {} && deeperErrorsRhs == {}){
-			msgs += { error("Invalid types of arguments of \<", e.src) | typeOf(lhs, tenv, useDef) != tint() || typeOf(rhs, tenv, useDef) != tint()};
-		}
-		msgs += deeperErrorsLhs + deeperErrorsRhs;
-	}
-    case leq(AExpr lhs, AExpr rhs):{
-		set[Message] deeperErrorsLhs = check(lhs, tenv, useDef);
-		set[Message] deeperErrorsRhs = check(rhs, tenv, useDef);
-		if(deeperErrorsLhs == {} && deeperErrorsRhs == {}){
-			msgs += { error("Invalid types of arguments of \<=", e.src) | typeOf(lhs, tenv, useDef) != tint() || typeOf(rhs, tenv, useDef) != tint()};
-		}
-		msgs += deeperErrorsLhs + deeperErrorsRhs;
-	}
-    case gt(AExpr lhs, AExpr rhs):{
-		set[Message] deeperErrorsLhs = check(lhs, tenv, useDef);
-		set[Message] deeperErrorsRhs = check(rhs, tenv, useDef);
-		if(deeperErrorsLhs == {} && deeperErrorsRhs == {}){
-			msgs += { error("Invalid types of arguments of \>", e.src) | typeOf(lhs, tenv, useDef) != tint() || typeOf(rhs, tenv, useDef) != tint()};
-		}
-		msgs += deeperErrorsLhs + deeperErrorsRhs;
-	}
-    case geq(AExpr lhs, AExpr rhs):{
-		set[Message] deeperErrorsLhs = check(lhs, tenv, useDef);
-		set[Message] deeperErrorsRhs = check(rhs, tenv, useDef);
-		if(deeperErrorsLhs == {} && deeperErrorsRhs == {}){
-			msgs += { error("Invalid types of arguments of \>=", e.src) | typeOf(lhs, tenv, useDef) != tint() || typeOf(rhs, tenv, useDef) != tint()};
-		}
-		msgs += deeperErrorsLhs + deeperErrorsRhs;
-	}
-    case equal(AExpr lhs, AExpr rhs):{
-		set[Message] deeperErrorsLhs = check(lhs, tenv, useDef);
-		set[Message] deeperErrorsRhs = check(rhs, tenv, useDef);
-		if(deeperErrorsLhs == {} && deeperErrorsRhs == {}){
-			msgs += { error("Invalid types of arguments of ==", e.src) | typeOf(lhs, tenv, useDef) != typeOf(rhs, tenv, useDef) || typeOf(rhs, tenv, useDef) == tunknown()};
-		}
-		msgs += deeperErrorsLhs + deeperErrorsRhs;
-	}
-	   
-    case neq(AExpr lhs, AExpr rhs):{
-		set[Message] deeperErrorsLhs = check(lhs, tenv, useDef);
-		set[Message] deeperErrorsRhs = check(rhs, tenv, useDef);
-		if(deeperErrorsLhs == {} && deeperErrorsRhs == {}){
-	  		msgs += { error("Invalid types of arguments of !=", e.src) | typeOf(lhs, tenv, useDef) != typeOf(rhs, tenv, useDef) || typeOf(rhs, tenv, useDef) == tunknown()}; 
-		}
-		msgs += deeperErrorsLhs + deeperErrorsRhs;
-	}
-    case and(AExpr lhs, AExpr rhs):{
-		set[Message] deeperErrorsLhs = check(lhs, tenv, useDef);
-		set[Message] deeperErrorsRhs = check(rhs, tenv, useDef);
-		if(deeperErrorsLhs == {} && deeperErrorsRhs == {}){
-	  		msgs += { error("Invalid types of arguments of AND", e.src) | typeOf(lhs, tenv, useDef) != tbool() || typeOf(rhs, tenv, useDef) != tbool()}; 
-		}
-		msgs += deeperErrorsLhs + deeperErrorsRhs;
-	}
-    case or(AExpr lhs, AExpr rhs):{
-		set[Message] deeperErrorsLhs = check(lhs, tenv, useDef);
-		set[Message] deeperErrorsRhs = check(rhs, tenv, useDef);
-		if(deeperErrorsLhs == {} && deeperErrorsRhs == {}){
-	  		msgs += { error("Invalid types of arguments of OR", e.src) | typeOf(lhs, tenv, useDef) != tbool() || typeOf(rhs, tenv, useDef) != tbool()}; 
-		}
-		msgs += deeperErrorsLhs + deeperErrorsRhs;
 	}
    }
-  
   return msgs; 
 }
 
