@@ -21,15 +21,19 @@ loc errors = |project://QL/examples/errors.myql|;
 
 loc tax = |project://QL/examples/tax.myql|;
 
-loc chosen = tax;
+loc chosen = errors;
 
 AForm f = cst2ast(parse(#start[Form], chosen));
 
 void testProgram(){
-	for(Message m <- check(f)){
+	set[Message] errorsWarnings = check(f);
+	bool errorsPresent = false;
+	for(Message m <- errorsWarnings){
+		if(error(str _, loc _) := m) errorsPresent = true;
 		println(m);
 	}
-	compile(f);
+	if(errorsPresent) println("Errors detected. Aborting...");
+	else compile(f);
 }
 
 test bool testEvaluation() = (eval(f, input("hasMaintLoan", vbool(true)), initialEnv(f)) == ("valLoss":vstr(""),

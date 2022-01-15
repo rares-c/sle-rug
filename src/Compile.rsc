@@ -5,6 +5,7 @@ import Resolve;
 import IO;
 import lang::html5::DOM; // see standard library
 import String;
+import Boolean;
 
 /*
  * Implement a compiler for QL to HTML and Javascript
@@ -112,38 +113,45 @@ str generateQuestions(AForm f){
 	return returnString;
 }
 
+str auxGenInitValues(str label, AId identifier, AType tp){
+	str returnString = "";
+	switch(tp){
+		case integerType(): returnString += "document.getElementById(\"<identifier.name + "-" + label[1..-1]>\").value = questions[\"<identifier.name>\"];\n";
+		case stringType(): returnString += "document.getElementById(\"<identifier.name + "-" + label[1..-1]>\").value = questions[\"<identifier.name>\"];\n";
+		case booleanType(): 
+			returnString += "if(questions[\"<identifier.name>\"]) {
+			'	document.getElementById(\"<identifier.name + "-" + label[1..-1] + "-true">\").checked = true;
+			'	document.getElementById(\"<identifier.name + "-" + label[1..-1] + "-false">\").checked = false;
+			'	} else {
+			'	document.getElementById(\"<identifier.name + "-" + label[1..-1] + "-true">\").checked = false;
+			'	document.getElementById(\"<identifier.name + "-" + label[1..-1] + "-false">\").checked = true;
+			'	}
+			'";
+	}
+	return returnString;
+}
+
 str generateInitialValues(AForm f){
 	str returnString = "";
 	for(/qstn(str label, AId identifier, AType tp) := f){
-		switch(tp){
-					case integerType(): returnString += "document.getElementById(\"<identifier.name + "-" + label[1..-1]>\").value = questions[\"<identifier.name>\"];\n";
-					case stringType(): returnString += "document.getElementById(\"<identifier.name + "-" + label[1..-1]>\").value = questions[\"<identifier.name>\"];\n";
-					case booleanType(): 
-						returnString += "if(questions[\"<identifier.name>\"]) {
-						'	document.getElementById(\"<identifier.name + "-" + label[1..-1] + "-true">\").checked = true;
-						'	document.getElementById(\"<identifier.name + "-" + label[1..-1] + "-false">\").checked = false;
-						'	} else {
-						'	document.getElementById(\"<identifier.name + "-" + label[1..-1] + "-true">\").checked = false;
-						'	document.getElementById(\"<identifier.name + "-" + label[1..-1] + "-false">\").checked = true;
-						'	}
-						'";
-				}
+		returnString += auxGenInitValues(label, identifier, tp);
 	}
 	
 	for(/qstn(str label, AId identifier, AType tp, AExpr _) := f){
-		switch(tp){
-					case integerType(): returnString += "document.getElementById(\"<identifier.name + "-" + label[1..-1]>\").value = questions[\"<identifier.name>\"];\n";
-					case stringType(): returnString += "document.getElementById(\"<identifier.name + "-" + label[1..-1]>\").value = questions[\"<identifier.name>\"];\n";
-					case booleanType(): 
-						returnString += "if(questions[\"<identifier.name>\"]) {
-						'	document.getElementById(\"<identifier.name + "-" + label[1..-1] + "-true">\").checked = true;
-						'	document.getElementById(\"<identifier.name + "-" + label[1..-1] + "-false">\").checked = false;
-						'	} else {
-						'	document.getElementById(\"<identifier.name + "-" + label[1..-1] + "-true">\").checked = false;
-						'	document.getElementById(\"<identifier.name + "-" + label[1..-1] + "-false">\").checked = true;
-						'	}
-						'";
-				}
+		returnString += auxGenInitValues(label, identifier, tp);
+	}
+	return returnString;
+}
+
+str auxGenInitUpdate(str label, AId identifier, AType tp){
+	str returnString = "";
+	switch(tp){
+		case booleanType(): {
+			returnString += "updateForm(\"<identifier.name + "-" + label[1..-1] + "-true">\");\n";
+			returnString += "updateForm(\"<identifier.name + "-" + label[1..-1] + "-false">\");\n";
+		}
+		case integerType(): returnString += "updateForm(\"<identifier.name + "-" + label[1..-1]>\");\n";
+		case stringType(): returnString += "updateForm(\"<identifier.name + "-" + label[1..-1]>\");\n";
 	}
 	return returnString;
 }
@@ -151,26 +159,11 @@ str generateInitialValues(AForm f){
 str generateInitialUpdate(AForm f){
 	str returnString = "";
 	for(/qstn(str label, AId identifier, AType tp) := f){
-		switch(tp){
-			case booleanType(): {
-				returnString += "updateForm(\"<identifier.name + "-" + label[1..-1] + "-true">\");\n";
-				returnString += "updateForm(\"<identifier.name + "-" + label[1..-1] + "-false">\");\n";
-			}
-			case integerType(): returnString += "updateForm(\"<identifier.name + "-" + label[1..-1]>\");\n";
-			case stringType(): returnString += "updateForm(\"<identifier.name + "-" + label[1..-1]>\");\n";
-		}
-		
+		returnString += auxGenInitUpdate(label, identifier, tp);
 	}
 	
 	for(/qstn(str label, AId identifier, AType tp, AExpr _) := f){
-		switch(tp){
-			case booleanType(): {
-				returnString += "updateForm(\"<identifier.name + "-" + label[1..-1] + "-true">\");\n";
-				returnString += "updateForm(\"<identifier.name + "-" + label[1..-1] + "-false">\");\n";
-			}
-			case integerType(): returnString += "updateForm(\"<identifier.name + "-" + label[1..-1]>\");\n";
-			case stringType(): returnString += "updateForm(\"<identifier.name + "-" + label[1..-1]>\");\n";
-		}
+		returnString += auxGenInitUpdate(label, identifier, tp);
 	}
 	return returnString;
 }
@@ -245,13 +238,7 @@ str expr2js(AExpr expr){
 		case ref(AId id): returnString += "questions[\"<id.name>\"]";
 		case string(str name): returnString += "\"<name>\"";
 		case integer(int vlue): returnString += "<vlue>";
-		case boolean(bool boolean): {
-			if(boolean){
-				returnString += "true";
-			} else {
-				returnString += "false";
-			}
-		}
+		case boolean(bool boolean): returnString += toString(boolean);
 		case not(AExpr e): returnString += "!(" + expr2js(e) + ")";
 		case mul(AExpr lhs, AExpr rhs): returnString += "(" + expr2js(lhs) + ")" + "*" + "(" + expr2js(rhs) + ")";
 		case div(AExpr lhs, AExpr rhs): returnString += "(" + expr2js(lhs) + ")" + "/" + "(" + expr2js(rhs) + ")";
