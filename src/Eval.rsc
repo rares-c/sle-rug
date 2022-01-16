@@ -2,6 +2,9 @@ module Eval
 
 import AST;
 import Resolve;
+import CST2AST;
+import Syntax;
+import ParseTree;
 
 /*
  * Implement big-step semantics for QL
@@ -116,3 +119,36 @@ Value eval(AExpr e, VEnv venv) {
     default: throw "Unsupported expression <e>";
   }
 }
+
+test bool testEvaluation() = (eval(cst2ast(parse(#start[Form], |project://QL/examples/tax.myql|)), input("hasMaintLoan", vbool(true)), initialEnv(cst2ast(parse(#start[Form], |project://QL/examples/tax.myql|)))) == ("valLoss":vstr(""),
+  "hasMaintLoan":vbool(true),
+  "hasSoldHouse":vbool(false),
+  "privateDebt":vint(0),
+  "sellingPrice":vint(0),
+  "valueResidue":vint(0),
+  "hasBoughtHouse":vbool(false)));
+  
+  test bool testEvaluation2() = (eval(cst2ast(parse(#start[Form], |project://QL/examples/tax.myql|)), input("hasSoldHouse", vbool(true)), initialEnv(cst2ast(parse(#start[Form], |project://QL/examples/tax.myql|)))) == ("valLoss":vstr("this is a test"),
+  "hasMaintLoan":vbool(false),
+  "hasSoldHouse":vbool(true),
+  "privateDebt":vint(0),
+  "sellingPrice":vint(0),
+  "valueResidue":vint(0),
+  "hasBoughtHouse":vbool(false)));
+  
+  test bool testEvaluation3() = (eval(cst2ast(parse(#start[Form], |project://QL/examples/tax.myql|)), input("hasBoughtHouse", vbool(false)), initialEnv(cst2ast(parse(#start[Form], |project://QL/examples/tax.myql|)))) == ("valLoss":vstr(""),
+  "hasMaintLoan":vbool(false),
+  "hasSoldHouse":vbool(false),
+  "privateDebt":vint(0),
+  "sellingPrice":vint(0),
+  "valueResidue":vint(0),
+  "hasBoughtHouse":vbool(false)));
+  
+  // Test whether setting a variable inside an if-statement doesn't do anything if the guard is false
+  test bool testEvaluation4() = (eval(cst2ast(parse(#start[Form], |project://QL/examples/tax.myql|)), input("sellingPrice", vint(150)), initialEnv(cst2ast(parse(#start[Form], |project://QL/examples/tax.myql|)))) == ("valLoss":vstr(""),
+  "hasMaintLoan":vbool(false),
+  "hasSoldHouse":vbool(false),
+  "privateDebt":vint(0),
+  "sellingPrice":vint(0),
+  "valueResidue":vint(0),
+  "hasBoughtHouse":vbool(false)));

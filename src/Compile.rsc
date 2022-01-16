@@ -47,7 +47,6 @@ HTML5Node form2html(AForm f) {
 
 str questions2html(list[AQuestion] questions) {
 	str returnString = "";
-	
 	for (AQuestion q <- questions){
 		switch(q){
 			case qstn(str label, AId identifier, AType tp): {
