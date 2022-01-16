@@ -176,8 +176,10 @@ str generateUpdateFunction(AForm f){
 	'	} else if (id.split(\"-\")[id.split(\"-\").length - 1] === \"false\" && document.getElementById(id).checked === true) {
 	'		questions[trigger] = false;
 	'	} else if (document.getElementById(id).type === \"number\") {
+	'		if(isNaN(parseInt(document.getElementById(id).value))) return;
 	'		questions[trigger] = parseInt(document.getElementById(id).value);
 	'	} else {
+	'		if(isNaN(document.getElementById(id).value)) return;
 	'		questions[trigger] = document.getElementById(id).value;
 	'	}
 	'	<questions2js(f.questions)>
@@ -190,7 +192,8 @@ str questions2js(list[AQuestion] questions){
 	for (AQuestion q <- questions){
 		switch(q){
 			case qstn(str label, AId identifier, AType tp, AExpr expr): {
-				returnString += "questions[\"<identifier.name>\"] = <expr2js(expr)>;\n";
+				returnString += "var oldValue = questions[\"<identifier.name>\"];
+				'questions[\"<identifier.name>\"] = <expr2js(expr)>;\n";
 				switch(tp){
 					case integerType(): returnString += "document.getElementById(\"<identifier.name + "-" + label[1..-1]>\").value = questions[\"<identifier.name>\"];\n";
 					case stringType(): returnString += "document.getElementById(\"<identifier.name + "-" + label[1..-1]>\").value = questions[\"<identifier.name>\"];\n";
@@ -204,6 +207,7 @@ str questions2js(list[AQuestion] questions){
 						'	}
 						'";
 				}
+				returnString += "if(oldValue != questions[\"<identifier.name>\"]) updateForm(id);\n";
 			}
 			case ifqstn(AExpr guard, list[AQuestion] qstns):
 				returnString += "if(<expr2js(guard)>) {
