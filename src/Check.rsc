@@ -155,7 +155,14 @@ set[Message] check(AExpr e, TEnv tenv, UseDef useDef) {
 		    msgs += { error("Invalid type of argument of NOT", e.src) | typeOf(expr, tenv, useDef) != tbool()};
 		  }
 		  msgs += deeperErrors;
-	  }
+	}
+	case unminus(AExpr expr):{
+		  set[Message] deeperErrors = check(expr, tenv, useDef);
+		  if(deeperErrors == {}){
+		    msgs += { error("Invalid type of argument of unary MINUS", e.src) | typeOf(expr, tenv, useDef) != tint()};
+		  }
+		  msgs += deeperErrors;
+	}
 	case string(str _): ;
   	case integer(int _): ;
   	case boolean(bool _): ;
@@ -184,6 +191,7 @@ Type typeOf(AExpr e, TEnv tenv, UseDef useDef) {
     case integer(int _): return tint();
     case boolean(bool _): return tbool();
     case not(AExpr _): return tbool();
+    case unminus(AExpr _): return tint();
     case mul(AExpr _, AExpr _): return tint();
     case div(AExpr _, AExpr _): return tint();
   	case sum(AExpr _, AExpr _): return tint();

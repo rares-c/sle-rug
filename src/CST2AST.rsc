@@ -46,6 +46,7 @@ AExpr cst2ast(Expr e) {
     case (Expr)`<Bool x>`: return boolean(fromString("<x>"), src=e@\loc);
     case (Expr)`(<Expr x>)`: return cst2ast(x);
     case (Expr)`!<Expr x>`: return not(cst2ast(x), src=e@\loc);
+    case (Expr)`-<Expr x>`: return unminus(cst2ast(x), src=e@\loc);
     case (Expr)`<Expr lhs> * <Expr rhs>`: return mul(cst2ast(lhs), cst2ast(rhs), src=e@\loc);
     case (Expr)`<Expr lhs> / <Expr rhs>`: return div(cst2ast(lhs), cst2ast(rhs), src=e@\loc);
     case (Expr)`<Expr lhs> + <Expr rhs>`: return sum(cst2ast(lhs), cst2ast(rhs), src=e@\loc);

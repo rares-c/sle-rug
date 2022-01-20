@@ -104,6 +104,7 @@ Value eval(AExpr e, VEnv venv) {
     case integer(int vlue): return vint(vlue);
     case boolean(bool boolean): return vbool(boolean);
     case not(AExpr expr): return vbool(!eval(expr, venv).b);
+    case unminus(AExpr expr): return vint(-1 * eval(expr, venv).n);
     case mul(AExpr lhs, AExpr rhs): return vint(eval(lhs, venv).n * eval(rhs,venv).n);
     case div(AExpr lhs, AExpr rhs): return vint(eval(lhs, venv).n / eval(rhs,venv).n);
     case sum(AExpr lhs, AExpr rhs): return vint(eval(lhs, venv).n + eval(rhs,venv).n);

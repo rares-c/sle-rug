@@ -10,6 +10,9 @@ form taxOfficeExample {
      
     "Profit?"
      profit: integer
+     
+    "Test1"
+    testvar: integer = -profit
     
    
     // akjsdhakjshdkjsa
@@ -31,5 +34,6 @@ form taxOfficeExample {
     	valLoss: string = "this is a test"
       
   }
+  
 }
  

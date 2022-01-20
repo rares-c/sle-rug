@@ -243,6 +243,7 @@ str expr2js(AExpr expr){
 		case integer(int vlue): returnString += "<vlue>";
 		case boolean(bool boolean): returnString += toString(boolean);
 		case not(AExpr e): returnString += "!(" + expr2js(e) + ")";
+		case unminus(AExpr e): returnString += "(-1) * (" + expr2js(e) + ")";
 		case mul(AExpr lhs, AExpr rhs): returnString += "(" + expr2js(lhs) + ")" + "*" + "(" + expr2js(rhs) + ")";
 		case div(AExpr lhs, AExpr rhs): returnString += "(" + expr2js(lhs) + ")" + "/" + "(" + expr2js(rhs) + ")";
 		case sum(AExpr lhs, AExpr rhs): returnString += "(" + expr2js(lhs) + ")" + "+" + "(" + expr2js(rhs) + ")";
