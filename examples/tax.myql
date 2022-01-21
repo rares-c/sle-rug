@@ -1,19 +1,7 @@
 form taxOfficeExample { 
   "Did you buy a house in 2010?"
-    hasBoughtHouse: boolean
-    
-    "Profit times 100?"
-     comp2: integer = comp1 * 10
-     
-    "Profit times 10?"
-     comp1: integer = profit * 10
-     
-    "Profit?"
-     profit: integer
-     
-    "Test1"
-    testvar: integer = -profit
-    
+    hasBoughtHouse: boolean   
+   
    
     // akjsdhakjshdkjsa
     
@@ -31,7 +19,7 @@ form taxOfficeExample {
     "Value residue:"
       valueResidue: integer = sellingPrice - privateDebt
     "Value loss:"
-    	valLoss: string = "this is a test"
+    	valLoss: string = "there is no value loss"
       
   }
   

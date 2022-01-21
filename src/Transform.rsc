@@ -30,18 +30,23 @@ import ParseTree;
  *
  */
  
+// Method that flattens an abstract form by turning each question into an if-then question.
+// Nested if statements are mapped to a single if by taking the conjunction of the guards.
 AForm flatten(AForm f) {
   AExpr currentGuard = boolean(true);
   f.questions = flatten(f.questions, currentGuard);
   return f;
 }
 
+// Method that flattens a list of questions according to the aforementioned standard
 list[AQuestion] flatten(list[AQuestion] qs, AExpr currentGuard){
 	list[AQuestion] returnQs = [];
 	for(AQuestion q <- qs){
 		switch(q){
-			case qstn(str q, AId identifier, AType tp): returnQs += ifqstn(currentGuard, [qstn(q, identifier, tp)]);
-			case qstn(str q, AId identifier, AType tp, AExpr expr): returnQs += ifqstn(currentGuard, [qstn(q, identifier, tp, expr)]);
+			case qstn(str q, AId identifier, AType tp): 
+				returnQs += ifqstn(currentGuard, [qstn(q, identifier, tp)]);
+			case qstn(str q, AId identifier, AType tp, AExpr expr): 
+				returnQs += ifqstn(currentGuard, [qstn(q, identifier, tp, expr)]);
 			case ifqstn(AExpr guard, list[AQuestion] questions): {
 				AExpr newGuard = and(currentGuard, guard);
 				returnQs += flatten(questions, newGuard);
@@ -52,7 +57,8 @@ list[AQuestion] flatten(list[AQuestion] qs, AExpr currentGuard){
 				newGuard = and(currentGuard, not(guard));
 				returnQs += flatten(fQuestions, newGuard);
 			}
-			case qblock(list[AQuestion] questions): returnQs += flatten(questions, currentGuard);
+			case qblock(list[AQuestion] questions): 
+				returnQs += flatten(questions, currentGuard);
 		}
 	}
 	return returnQs;
@@ -65,6 +71,7 @@ list[AQuestion] flatten(list[AQuestion] qs, AExpr currentGuard){
  *
  */
  
+ // Method that renames the identifier at the given location to the new given name
  start[Form] rename(start[Form] f, loc useOrDef, str newName) {
    RefGraph r = resolve(cst2ast(f));
    set[loc] renameLoc = {};
@@ -74,10 +81,9 @@ list[AQuestion] flatten(list[AQuestion] qs, AExpr currentGuard){
      	renameLoc += {d};
      }
    } else if (useOrDef in r.defs<1>) {
-   	renameLoc += {useOrDef};
-   	renameLoc += {u | <loc u, useOrDef> <- r.useDef};
+   	 renameLoc += {useOrDef};
+   	 renameLoc += {u | <loc u, useOrDef> <- r.useDef};
    }
-   
    return visit(f){
    	case Id x => [Id]newName 
    		when x@\loc in renameLoc
