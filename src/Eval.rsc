@@ -18,10 +18,14 @@ import ParseTree;
 // - empty string "" for strings
 Value atype2def(AType tp){
 	switch(tp){
-		case integerType(): return vint(0);
-		case booleanType(): return vbool(false);
-		case stringType(): return vstr("");
-		default: throw("Unknown ATYPE");
+		case integerType(): 
+            return vint(0);
+		case booleanType(): 
+            return vbool(false);
+		case stringType(): 
+            return vstr("");
+		default: 
+            throw("Unknown ATYPE");
 	}
 }
 
@@ -46,8 +50,10 @@ data Input
 VEnv initialEnv(AForm f) {
   VEnv venv = ();
   visit(f){
-  	case qstn(str _, AId identifier, AType tp): venv += (identifier.name: atype2def(tp));
-  	case qstn(str _, AId identifier, AType tp, AExpr _): venv += (identifier.name: atype2def(tp));
+  	case qstn(str _, AId identifier, AType tp): 
+        venv += (identifier.name: atype2def(tp));
+  	case qstn(str _, AId identifier, AType tp, AExpr _): 
+        venv += (identifier.name: atype2def(tp));
   }
   return venv;
 }

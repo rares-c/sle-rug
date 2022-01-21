@@ -23,10 +23,11 @@ alias TEnv = rel[loc qdef, loc ndef, str name, str label, Type \type];
 TEnv collect(AForm f) {
   TEnv t = {};
   visit(f){
-  	case qs:qstn(str q, AId identifier, AType tp): t += <qs.src, identifier.src, identifier.name, q, atype2type(tp)>; 
-  	case qs:qstn(str q, AId identifier, AType tp, AExpr _): t += <qs.src, identifier.src, identifier.name, q, atype2type(tp)>;
-  }
-  
+  	case qs:qstn(str q, AId identifier, AType tp): 
+        t += <qs.src, identifier.src, identifier.name, q, atype2type(tp)>; 
+  	case qs:qstn(str q, AId identifier, AType tp, AExpr _): 
+        t += <qs.src, identifier.src, identifier.name, q, atype2type(tp)>;
+  } 
   return t; 
 }
 
@@ -252,7 +253,8 @@ Type atype2type(AType t){
   		return tbool();
   	case stringType(): 
   		return tstr();
-  	default: return tunknown();
+  	default: 
+        return tunknown();
   }
 }
 
