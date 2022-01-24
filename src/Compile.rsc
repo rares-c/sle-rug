@@ -28,81 +28,55 @@ void compile(AForm f) {
 
 // Method that maps an abstract form to a HTML page
 HTML5Node form2html(AForm f) {
-  return html(
-  "
-  '\<head\>
-  '	\<meta charset=\"UTF-8\"\>
-  '	\<meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\"\>
-  '	\<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"\>
-  '	\<title\>Questionnaire\</title\>
-  '	\<link rel=\"stylesheet\" href=\"https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css\" integrity=\"sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu\" crossorigin=\"anonymous\"\>
-  '\</head\>
-  '\<body\>
-  '	\<h1 style=\"display:flex; justify-content: center; text-align: center;\"\> <f.name> \</h1\>
-  ' \<div class=\"container\" style=\"margin-left: auto; margin-right: auto;\" \>
-  '	<questions2html(f.questions)>
-  ' \</div\>
-  '	\<script src=\"<split("/", f.src[extension="js"].top.uri)[-1]>\"\>\</script\>
-  '\</body\>\n"
-  );
+  return html(head(title("<f.name>"), link(\rel("stylesheet"), href("https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"))), 
+  			body(h1("<f.name>", html5attr("style", "display:flex; justify-content: center; text-align: center;")), 
+  			html5node("div", [class("container")] + questions2html(f.questions)), script(src("<split("/", f.src[extension="js"].top.uri)[-1]>"))));
 }
 
 // Method that maps each abstract question from the given list to an input field and a label in the HTML page 
-str questions2html(list[AQuestion] questions) {
-	str returnString = "";
+list[HTML5Node] questions2html(list[AQuestion] questions) {
+	list[HTML5Node] returnList = [];
 	for (AQuestion q <- questions){
 		switch(q){
-			case qstn(str label, AId identifier, AType tp): {
-				returnString += "<label[1..-1]>\<br\>\n";
+			case qstn(str lbl, AId identifier, AType tp): {
+				returnList += [p("<lbl[1..-1]>")];
 				switch(tp){
 					case integerType(): 
-						returnString += "\<input type=\"number\" id=\"<identifier.name + "-" + label[1..-1]>\" name=\"<identifier.name + "-" + label[1..-1]>\" oninput=\"updateForm(this.id)\"  \>\<br\>\n";
+						returnList += [input(\type("number"), id("<identifier.name + "-" + lbl[1..-1]>"), name("<identifier.name + "-" + lbl[1..-1]>"), oninput("updateForm(this.id)"))];
 					case booleanType(): 
-						returnString += "\<input type=\"radio\" id=\"<identifier.name + "-" + label[1..-1] + "-true">\" name=\"<identifier.name + "-" + label[1..-1]>\" value=\"True\" oninput=\"updateForm(this.id)\" \>
-						'\<label for=\"<identifier.name + "-" + label[1..-1] + "-true">\"\> Yes \</label\>\<br\>
-						'\<input type=\"radio\" id=\"<identifier.name + "-" + label[1..-1] + "-false">\" name=\"<identifier.name + "-" + label[1..-1]>\" value=\"False\" oninput=\"updateForm(this.id)\" \>
-						'\<label for=\"<identifier.name + "-" + label[1..-1] + "-false">\"\> No \</label\>\<br\>
-						'";
+						returnList += [input(\type("radio"), id("<identifier.name + "-" + lbl[1..-1] + "-true">"), name("<identifier.name + "-" + lbl[1..-1]>"), \value("True"), oninput("updateForm(this.id)")),
+							label(\for("<identifier.name + "-" + lbl[1..-1] + "-true">"), "Yes"),
+							input(\type("radio"), id("<identifier.name + "-" + lbl[1..-1] + "-false">"), name("<identifier.name + "-" + lbl[1..-1]>"), \value("False"), oninput("updateForm(this.id)")),
+							label(\for("<identifier.name + "-" + lbl[1..-1] + "-false">"), "No")];
 					case stringType(): 
-						returnString += "\<input type=\"text\" id=\"<identifier.name + "-" + label[1..-1]>\" name=\"<identifier.name + "-" + label[1..-1]>\" oninput=\"updateForm(this.id)\" \>\<br\> \n";
+						returnList += [input(\type("text"), id("<identifier.name + "-" + lbl[1..-1]>"), name("<identifier.name + "-" + lbl[1..-1]>"), oninput("updateForm(this.id)"))];
 				}
 			}
-			case qstn(str label, AId identifier, AType tp, AExpr _): {
-				returnString += "<label[1..-1]>\<br\>\n";
+			case qstn(str lbl, AId identifier, AType tp, AExpr _): {
+				returnList += [p("<lbl[1..-1]>")];
 				switch(tp){
 					case integerType(): 
-						returnString += "\<input type=\"number\" disabled id=\"<identifier.name + "-" + label[1..-1]>\" name=\"<identifier.name + "-" + label[1..-1]>\"\>\<br\>\n";
+						returnList += [input(\type("number"), disabled(""), id("<identifier.name + "-" + lbl[1..-1]>"), name("<identifier.name + "-" + lbl[1..-1]>"))];
 					case booleanType(): 
-						returnString += "\<input type=\"radio\" disabled id=\"<identifier.name + "-" + label[1..-1] + "-true">\" name=\"<identifier.name + "-" + label[1..-1]>\" value=\"True\"\>
-						'\<label for=\"<identifier.name + "-" + label[1..-1] + "-true">\"\> Yes \</label\>\<br\>
-						'\<input type=\"radio\" disabled id=\"<identifier.name + "-" + label[1..-1] + "-false">\" name=\"<identifier.name + "-" + label[1..-1]>\" value=\"False\"\>
-						'\<label for=\"<identifier.name + "-" + label[1..-1] + "-false">\"\> No \</label\>\<br\>
-						'";
+						returnList += [input(\type("radio"), disabled(""), id("<identifier.name + "-" + lbl[1..-1] + "-true">"), name("<identifier.name + "-" + lbl[1..-1]>"), \value("True")),
+							label(\for("<identifier.name + "-" + lbl[1..-1] + "-true">"), "Yes"),
+							input(\type("radio"), disabled(""), id("<identifier.name + "-" + lbl[1..-1] + "-false">"), name("<identifier.name + "-" + lbl[1..-1]>"), \value("False")),
+							label(\for("<identifier.name + "-" + lbl[1..-1] + "-false">"), "No")];
 					case stringType(): 
-						returnString += "\<input type=\"text\" disabled id=\"<identifier.name + "-" + label[1..-1]>\" name=\"<identifier.name + "-" + label[1..-1]>\"\>\<br\> \n";
+						returnList += [input(\type("text"), disabled(""), id("<identifier.name + "-" + lbl[1..-1]>"), name("<identifier.name + "-" + lbl[1..-1]>"))];
 				}
 			}
-			case ifqstn(AExpr guard, list[AQuestion] qstns): { // map if-then questions to div containing all the questions in the corresponding list
-				returnString += "\<div id=\"<guard.src>\" style=\"display: none;\" \>\n";
-				returnString += questions2html(qstns);
-				returnString += "\</div\>\n";
-			}
+			case ifqstn(AExpr guard, list[AQuestion] qstns):  // map if-then questions to div containing all the questions in the corresponding list
+				returnList += [div(id("<guard.src>"), html5attr("style", "display: none;"), html5node("div", questions2html(qstns)))];
 			case ifelqstn(AExpr guard, list[AQuestion] tQuestions, list[AQuestion] fQuestions): {
-				returnString += "\<div id=\"<guard.src>\" style=\"display: none;\" \>\n";
-				returnString += questions2html(tQuestions);
-				returnString += "\</div\>\n";
-				returnString += "\<div id=\"else-<guard.src>\" style=\"display: none;\" \>\n";
-				returnString += questions2html(fQuestions);
-				returnString += "\</div\>\n";
+				returnList += [div(id("<guard.src>"), html5attr("style", "display: none;"), html5node("div", questions2html(tQuestions))),
+							   div(id("else-<guard.src>"), html5attr("style", "display: none;"), html5node("div", questions2html(fQuestions)))];
 			}
-			case qblock(list[AQuestion] questions): {
-				returnString += "\<div\>\n";
-				returnString += questions2html(questions);
-				returnString += "\</div\>\n";
-			}
+			case qblock(list[AQuestion] blockQuestions): 
+				returnList += [html5node("div", questions2html(blockQuestions))];
 		}
 	}
-	return returnString;
+	return returnList;
 }
 
 // Method that generates the JS needed to update the form

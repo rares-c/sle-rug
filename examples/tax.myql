@@ -19,9 +19,7 @@ form taxOfficeExample {
     "Value residue:"
       valueResidue: integer = sellingPrice - privateDebt
     "Value loss:"
-    	valLoss: string = "there is no value loss"
-      
+    	valLoss: string = "there is no value loss"   
   }
-  
 }
  
