@@ -22,15 +22,15 @@ import Boolean;
 
 // Method that compiles an abstract form to a HTML and JS script
 void compile(AForm f) {
-  writeFile(f.src[extension="js"].top, form2js(f));
-  writeFile(f.src[extension="html"].top, toString(form2html(f)));
+    writeFile(f.src[extension="js"].top, form2js(f));
+    writeFile(f.src[extension="html"].top, toString(form2html(f)));
 }
 
 // Method that maps an abstract form to a HTML page
 HTML5Node form2html(AForm f) {
-  return html(head(title("<f.name>"), link(\rel("stylesheet"), href("https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"))), 
-  			body(h1("<f.name>", html5attr("style", "display:flex; justify-content: center; text-align: center;")), 
-  			html5node("div", [class("container")] + questions2html(f.questions)), script(src("<split("/", f.src[extension="js"].top.uri)[-1]>"))));
+    return html(head(title("<f.name>"), link(\rel("stylesheet"), href("https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"))), 
+                body(h1("<f.name>", html5attr("style", "display:flex; justify-content: center; text-align: center;")), 
+                html5node("div", [class("container")] + questions2html(f.questions)), script(src("<split("/", f.src[extension="js"].top.uri)[-1]>"))));
 }
 
 // Method that maps each abstract question from the given list to an input field and a label in the HTML page 
@@ -81,13 +81,13 @@ list[HTML5Node] questions2html(list[AQuestion] questions) {
 
 // Method that generates the JS needed to update the form
 str form2js(AForm f) {
-  return "
-  ' var questions = {};
-  ' <generateQuestions(f)>
-  ' <generateInitialValues(f)>
-  ' <generateInitialUpdate(f)>
-  ' <generateUpdateFunction(f)>
-  ";
+    return "
+    ' var questions = {};
+    ' <generateQuestions(f)>
+    ' <generateInitialValues(f)>
+    ' <generateInitialUpdate(f)>
+    ' <generateUpdateFunction(f)>
+    '";
 }
 
 // Method that generates default values for each regular and computed questions

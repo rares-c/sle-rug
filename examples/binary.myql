@@ -23,7 +23,6 @@ form binary {
         }
       }
     }
-    
     else { 
       "Is the number between 5 and 7" x_5_7: boolean
       if (x_5_7) { 

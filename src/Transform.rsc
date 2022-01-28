@@ -33,9 +33,9 @@ import ParseTree;
 // Method that flattens an abstract form by turning each question into an if-then question.
 // Nested if statements are mapped to a single if by taking the conjunction of the guards.
 AForm flatten(AForm f) {
-  AExpr currentGuard = boolean(true);
-  f.questions = flatten(f.questions, currentGuard);
-  return f;
+    AExpr currentGuard = boolean(true);
+    f.questions = flatten(f.questions, currentGuard);
+    return f;
 }
 
 // Method that flattens a list of questions according to the aforementioned standard
@@ -73,21 +73,21 @@ list[AQuestion] flatten(list[AQuestion] qs, AExpr currentGuard){
  
  // Method that renames the identifier at the given location to the new given name
  start[Form] rename(start[Form] f, loc useOrDef, str newName) {
-   RefGraph r = resolve(cst2ast(f));
-   set[loc] renameLoc = {};
-   if(useOrDef in r.uses<0>){
-     if(<useOrDef, loc d> <- r.useDef){
-     	renameLoc += {u | <loc u, d> <- r.useDef};
-     	renameLoc += {d};
-     }
-   } else if (useOrDef in r.defs<1>) {
-   	 renameLoc += {useOrDef};
-   	 renameLoc += {u | <loc u, useOrDef> <- r.useDef};
-   }
-   return visit(f){
-   	case Id x => [Id]newName 
-   		when x@\loc in renameLoc
-   } 
+    RefGraph r = resolve(cst2ast(f));
+    set[loc] renameLoc = {};
+    if(useOrDef in r.uses<0>){
+        if(<useOrDef, loc d> <- r.useDef){
+            renameLoc += {u | <loc u, d> <- r.useDef};
+            renameLoc += {d};
+        }
+    } else if (useOrDef in r.defs<1>) {
+        renameLoc += {useOrDef};
+        renameLoc += {u | <loc u, useOrDef> <- r.useDef};
+    }
+    return visit(f){
+        case Id x => [Id]newName 
+            when x@\loc in renameLoc
+    } 
  } 
  
  
